@@ -33,8 +33,6 @@ const AppContent: React.FC = () => {
         return <Finance />;
       case 'products':
         return <Products />;
-      case 'materials':
-        return <Materials />;
       case 'stock':
         return <Stock />;
       case 'settings':

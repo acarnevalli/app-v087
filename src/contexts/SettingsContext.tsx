@@ -13,7 +13,13 @@ export interface PDFSettings {
       fontWeight: 'normal' | 'bold';
       color: string; // hex color
     };
-    backgroundColor: string; // hex color
+    backgroundColor: string; // hex color (para compatibilidade)
+    gradient: {
+      enabled: boolean;
+      startColor: string; // hex color
+      endColor: string; // hex color
+      direction: 'horizontal' | 'vertical' | 'diagonal-right' | 'diagonal-left';
+    };
     height: number; // altura do cabeçalho
   };
   company: {
@@ -69,6 +75,12 @@ const defaultPDFSettings: PDFSettings = {
       color: '#FFFFFF'
     },
     backgroundColor: '#4682B4',
+    gradient: {
+      enabled: false,
+      startColor: '#4682B4',
+      endColor: '#1E40AF',
+      direction: 'horizontal'
+    },
     height: 35
   },
   company: {

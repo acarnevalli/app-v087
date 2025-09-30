@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, FileText, Palette, Image, Building, RotateCcw } from 'lucide-react';
+import { X, FileText, Palette, Image, Building, RotateCcw, Zap } from 'lucide-react';
 import { useSettings, PDFSettings } from '../contexts/SettingsContext';
 
 interface PDFSettingsModalProps {
@@ -27,6 +27,17 @@ const PDFSettingsModal: React.FC<PDFSettingsModalProps> = ({ onClose }) => {
           ...pdfSettings.header,
           companyName: {
             ...pdfSettings.header.companyName,
+            [subField]: value
+          }
+        }
+      });
+    } else if (field.startsWith('gradient.')) {
+      const subField = field.split('.')[1];
+      updatePDFSettings({
+        header: {
+          ...pdfSettings.header,
+          gradient: {
+            ...pdfSettings.header.gradient,
             [subField]: value
           }
         }
@@ -200,6 +211,109 @@ const PDFSettingsModal: React.FC<PDFSettingsModalProps> = ({ onClose }) => {
               <div className="space-y-6">
                 <h3 className="text-xl font-bold text-gray-800 mb-4">Configurações do Cabeçalho</h3>
                 
+                {/* Configurações de Gradiente */}
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-lg border border-purple-200">
+                  <h4 className="text-lg font-semibold text-purple-800 mb-4 flex items-center">
+                    <Zap className="h-5 w-5 mr-2" />
+                    Gradiente do Cabeçalho
+                  </h4>
+                  
+                  <div className="space-y-4">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={pdfSettings.header.gradient.enabled}
+                        onChange={(e) => handleHeaderChange('gradient.enabled', e.target.checked)}
+                        className="text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="font-medium text-purple-700">Usar gradiente no cabeçalho</span>
+                    </label>
+                    
+                    {pdfSettings.header.gradient.enabled && (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-purple-700 mb-2">
+                              Cor Inicial
+                            </label>
+                            <div className="flex items-center space-x-3">
+                              <input
+                                type="color"
+                                value={pdfSettings.header.gradient.startColor}
+                                onChange={(e) => handleHeaderChange('gradient.startColor', e.target.value)}
+                                className="w-12 h-10 border border-purple-300 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={pdfSettings.header.gradient.startColor}
+                                onChange={(e) => handleHeaderChange('gradient.startColor', e.target.value)}
+                                className="flex-1 px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                placeholder="#4682B4"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-purple-700 mb-2">
+                              Cor Final
+                            </label>
+                            <div className="flex items-center space-x-3">
+                              <input
+                                type="color"
+                                value={pdfSettings.header.gradient.endColor}
+                                onChange={(e) => handleHeaderChange('gradient.endColor', e.target.value)}
+                                className="w-12 h-10 border border-purple-300 rounded cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={pdfSettings.header.gradient.endColor}
+                                onChange={(e) => handleHeaderChange('gradient.endColor', e.target.value)}
+                                className="flex-1 px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                placeholder="#1E40AF"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-purple-700 mb-2">
+                            Direção do Gradiente
+                          </label>
+                          <select
+                            value={pdfSettings.header.gradient.direction}
+                            onChange={(e) => handleHeaderChange('gradient.direction', e.target.value)}
+                            className="w-full px-4 py-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          >
+                            <option value="horizontal">Horizontal (esquerda → direita)</option>
+                            <option value="vertical">Vertical (cima → baixo)</option>
+                            <option value="diagonal-right">Diagonal (↘)</option>
+                            <option value="diagonal-left">Diagonal (↙)</option>
+                          </select>
+                        </div>
+
+                        {/* Preview do Gradiente */}
+                        <div className="mt-4">
+                          <label className="block text-sm font-medium text-purple-700 mb-2">
+                            Pré-visualização
+                          </label>
+                          <div 
+                            className="w-full h-16 rounded-lg border border-purple-300"
+                            style={{
+                              background: pdfSettings.header.gradient.direction === 'horizontal' 
+                                ? `linear-gradient(to right, ${pdfSettings.header.gradient.startColor}, ${pdfSettings.header.gradient.endColor})`
+                                : pdfSettings.header.gradient.direction === 'vertical'
+                                ? `linear-gradient(to bottom, ${pdfSettings.header.gradient.startColor}, ${pdfSettings.header.gradient.endColor})`
+                                : pdfSettings.header.gradient.direction === 'diagonal-right'
+                                ? `linear-gradient(to bottom right, ${pdfSettings.header.gradient.startColor}, ${pdfSettings.header.gradient.endColor})`
+                                : `linear-gradient(to bottom left, ${pdfSettings.header.gradient.startColor}, ${pdfSettings.header.gradient.endColor})`
+                            }}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -257,7 +371,8 @@ const PDFSettingsModal: React.FC<PDFSettingsModalProps> = ({ onClose }) => {
                     </div>
                   </div>
 
-                  <div>
+                  {!pdfSettings.header.gradient.enabled && (
+                    <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Cor de Fundo
                     </label>
@@ -276,7 +391,8 @@ const PDFSettingsModal: React.FC<PDFSettingsModalProps> = ({ onClose }) => {
                         placeholder="#4682B4"
                       />
                     </div>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>

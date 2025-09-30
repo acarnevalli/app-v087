@@ -15,7 +15,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage }) => {
     { id: 'clients', label: 'Clientes', icon: Users },
     { id: 'projects', label: 'Projetos', icon: Briefcase },
     { id: 'products', label: 'Produtos', icon: Package },
-    { id: 'materials', label: 'Materiais', icon: Wrench },
     { id: 'stock', label: 'Estoque', icon: BarChart3 },
     { id: 'finance', label: 'Finanças', icon: DollarSign },
     ...(user?.role === 'admin' ? [{ id: 'settings', label: 'Configurações', icon: Settings }] : []),

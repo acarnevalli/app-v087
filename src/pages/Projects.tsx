@@ -114,10 +114,45 @@ const Projects: React.FC = () => {
     }
     
     // Cabeçalho com cor personalizada
-    const headerColor = pdfSettings.header.backgroundColor;
-    const rgb = hexToRgb(headerColor);
-    doc.setFillColor(rgb.r, rgb.g, rgb.b);
-    doc.rect(0, 0, 210, pdfSettings.header.height, 'F');
+    if (pdfSettings.header.gradient.enabled) {
+      // Criar gradiente usando múltiplas camadas
+      const startRgb = hexToRgb(pdfSettings.header.gradient.startColor);
+      const endRgb = hexToRgb(pdfSettings.header.gradient.endColor);
+      
+      // Simular gradiente com múltiplas faixas
+      const steps = 20;
+      const stepHeight = pdfSettings.header.height / steps;
+      
+      for (let i = 0; i < steps; i++) {
+        const ratio = i / (steps - 1);
+        const r = Math.round(startRgb.r + (endRgb.r - startRgb.r) * ratio);
+        const g = Math.round(startRgb.g + (endRgb.g - startRgb.g) * ratio);
+        const b = Math.round(startRgb.b + (endRgb.b - startRgb.b) * ratio);
+        
+        doc.setFillColor(r, g, b);
+        
+        if (pdfSettings.header.gradient.direction === 'horizontal') {
+          const stepWidth = 210 / steps;
+          doc.rect(i * stepWidth, 0, stepWidth, pdfSettings.header.height, 'F');
+        } else if (pdfSettings.header.gradient.direction === 'vertical') {
+          doc.rect(0, i * stepHeight, 210, stepHeight, 'F');
+        } else if (pdfSettings.header.gradient.direction === 'diagonal-right') {
+          // Gradiente diagonal da esquerda superior para direita inferior
+          const stepWidth = 210 / steps;
+          doc.rect(i * stepWidth, 0, stepWidth, pdfSettings.header.height, 'F');
+        } else { // diagonal-left
+          // Gradiente diagonal da direita superior para esquerda inferior
+          const stepWidth = 210 / steps;
+          doc.rect((steps - 1 - i) * stepWidth, 0, stepWidth, pdfSettings.header.height, 'F');
+        }
+      }
+    } else {
+      // Cor sólida tradicional
+      const headerColor = pdfSettings.header.backgroundColor;
+      const rgb = hexToRgb(headerColor);
+      doc.setFillColor(rgb.r, rgb.g, rgb.b);
+      doc.rect(0, 0, 210, pdfSettings.header.height, 'F');
+    }
     
     // Adicionar logo no cabeçalho
     try {
