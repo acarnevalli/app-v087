@@ -3,6 +3,7 @@ import { Plus, Search, CreditCard as Edit2, Trash2, Shield, User, Mail, Clock, S
 import { useAuth, User as UserType } from '../contexts/AuthContext';
 import UserModal from '../components/UserModal';
 import PDFSettingsModal from '../components/PDFSettingsModal';
+import CompanySettingsModal from '../components/CompanySettingsModal';
 import ImportExportModal from '../components/ImportExportModal';
 import ProductSettingsModal from '../components/ProductSettingsModal';
 
@@ -12,6 +13,7 @@ const Settings: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserType | null>(null);
   const [isPDFModalOpen, setIsPDFModalOpen] = useState(false);
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isImportExportModalOpen, setIsImportExportModalOpen] = useState(false);
   const [isProductSettingsModalOpen, setIsProductSettingsModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<'users' | 'system' | null>(null);
@@ -102,6 +104,14 @@ const Settings: React.FC = () => {
       icon: FileText,
       color: 'text-blue-600',
       action: () => setIsPDFModalOpen(true)
+    },
+    {
+      id: 'company',
+      title: 'Dados da Empresa',
+      description: 'Informações básicas, fiscais e bancárias',
+      icon: Building,
+      color: 'text-indigo-600',
+      action: () => setIsCompanyModalOpen(true)
     },
     {
       id: 'products',
@@ -374,7 +384,7 @@ const Settings: React.FC = () => {
             <p className="text-gray-600 mt-1">Personalize o comportamento e aparência do sistema</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {systemSubItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -409,6 +419,11 @@ const Settings: React.FC = () => {
       {/* Modal de Configurações PDF */}
       {isPDFModalOpen && (
         <PDFSettingsModal onClose={() => setIsPDFModalOpen(false)} />
+      )}
+
+      {/* Modal de Configurações da Empresa */}
+      {isCompanyModalOpen && (
+        <CompanySettingsModal onClose={() => setIsCompanyModalOpen(false)} />
       )}
 
       {/* Modal de Importar/Exportar */}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { X, FileText, Palette, Image, Building, RotateCcw, Zap } from 'lucide-react';
-import { useSettings, PDFSettings } from '../contexts/SettingsContext';
+import { X, FileText, Palette, Image, RotateCcw, Zap } from 'lucide-react';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface PDFSettingsModalProps {
   onClose: () => void;
@@ -8,7 +8,7 @@ interface PDFSettingsModalProps {
 
 const PDFSettingsModal: React.FC<PDFSettingsModalProps> = ({ onClose }) => {
   const { pdfSettings, updatePDFSettings, resetPDFSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<'watermark' | 'header' | 'company'>('watermark');
+  const [activeTab, setActiveTab] = useState<'watermark' | 'header'>('watermark');
 
   const handleWatermarkChange = (field: keyof PDFSettings['watermark'], value: any) => {
     updatePDFSettings({
@@ -52,15 +52,6 @@ const PDFSettingsModal: React.FC<PDFSettingsModalProps> = ({ onClose }) => {
     }
   };
 
-  const handleCompanyChange = (field: keyof PDFSettings['company'], value: string) => {
-    updatePDFSettings({
-      company: {
-        ...pdfSettings.company,
-        [field]: value
-      }
-    });
-  };
-
   const handleReset = () => {
     if (window.confirm('Tem certeza que deseja restaurar as configurações padrão?')) {
       resetPDFSettings();
@@ -69,8 +60,7 @@ const PDFSettingsModal: React.FC<PDFSettingsModalProps> = ({ onClose }) => {
 
   const tabs = [
     { id: 'watermark', label: 'Marca d\'água', icon: Image },
-    { id: 'header', label: 'Cabeçalho', icon: Palette },
-    { id: 'company', label: 'Empresa', icon: Building }
+    { id: 'header', label: 'Cabeçalho', icon: Palette }
   ];
 
   return (
@@ -412,102 +402,6 @@ const PDFSettingsModal: React.FC<PDFSettingsModalProps> = ({ onClose }) => {
                     <span>25px</span>
                     <span>50px</span>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'company' && (
-              <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Informações da Empresa</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Nome da Empresa
-                    </label>
-                    <input
-                      type="text"
-                      value={pdfSettings.company.name}
-                      onChange={(e) => handleCompanyChange('name', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Telefone
-                    </label>
-                    <input
-                      type="text"
-                      value={pdfSettings.company.phone}
-                      onChange={(e) => handleCompanyChange('phone', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value={pdfSettings.company.email}
-                      onChange={(e) => handleCompanyChange('email', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      CNPJ
-                    </label>
-                    <input
-                      type="text"
-                      value={pdfSettings.company.cnpj}
-                      onChange={(e) => handleCompanyChange('cnpj', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Inscrição Estadual
-                    </label>
-                    <input
-                      type="text"
-                      value={pdfSettings.company.ie}
-                      onChange={(e) => handleCompanyChange('ie', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Endereço
-                  </label>
-                  <input
-                    type="text"
-                    value={pdfSettings.company.address}
-                    onChange={(e) => handleCompanyChange('address', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Cidade
-                  </label>
-                  <input
-                    type="text"
-                    value={pdfSettings.company.city}
-                    onChange={(e) => handleCompanyChange('city', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
                 </div>
               </div>
             )}

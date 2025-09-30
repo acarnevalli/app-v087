@@ -22,14 +22,46 @@ export interface PDFSettings {
     };
     height: number; // altura do cabeçalho
   };
-  company: {
+}
+
+export interface CompanySettings {
+  basic: {
     name: string;
-    address: string;
-    city: string;
-    phone: string;
+    tradeName: string; // Nome fantasia
     email: string;
+    website: string;
+    phone: string;
+    mobile: string;
+  };
+  address: {
+    street: string;
+    number: string;
+    complement: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  fiscal: {
     cnpj: string;
-    ie: string;
+    ie: string; // Inscrição Estadual
+    im: string; // Inscrição Municipal
+    taxRegime: 'simples_nacional' | 'lucro_presumido' | 'lucro_real' | 'mei';
+    icmsContributor: boolean;
+    issContributor: boolean;
+    pisContributor: boolean;
+    cofinsContributor: boolean;
+    crt: '1' | '2' | '3'; // Código de Regime Tributário
+    cnae: string; // Código CNAE principal
+    cnaes: string[]; // CNAEs secundários
+  };
+  banking: {
+    bank: string;
+    agency: string;
+    account: string;
+    accountType: 'corrente' | 'poupanca';
+    pix: string;
   };
 }
 
@@ -54,10 +86,13 @@ export interface ProductSettings {
 
 interface SettingsContextType {
   pdfSettings: PDFSettings;
+  companySettings: CompanySettings;
   productSettings: ProductSettings;
   updatePDFSettings: (settings: Partial<PDFSettings>) => void;
+  updateCompanySettings: (settings: Partial<CompanySettings>) => void;
   updateProductSettings: (settings: Partial<ProductSettings>) => void;
   resetPDFSettings: () => void;
+  resetCompanySettings: () => void;
   resetProductSettings: () => void;
 }
 
@@ -82,18 +117,49 @@ const defaultPDFSettings: PDFSettings = {
       direction: 'horizontal'
     },
     height: 35
-  },
-  company: {
-    name: 'CARNEVALLI ESQUADRIAS LTDA',
-    address: 'BUARQUE DE MACEDO, 2735 - PAVILHÃO - CENTRO',
-    city: 'Nova Prata - RS - CEP: 95320-000',
-    phone: '(54) 3242-2072',
-    email: 'carnevalli.esquadrias@gmail.com',
-    cnpj: '88.235.288/0001-24',
-    ie: '0850011930'
   }
 };
 
+const defaultCompanySettings: CompanySettings = {
+  basic: {
+    name: 'CARNEVALLI ESQUADRIAS LTDA',
+    tradeName: 'Carnevalli Esquadrias',
+    email: 'carnevalli.esquadrias@gmail.com',
+    website: 'www.carnevalliesquadrias.com.br',
+    phone: '(54) 3242-2072',
+    mobile: '(54) 99999-9999'
+  },
+  address: {
+    street: 'BUARQUE DE MACEDO',
+    number: '2735',
+    complement: 'PAVILHÃO',
+    neighborhood: 'CENTRO',
+    city: 'Nova Prata',
+    state: 'RS',
+    zipCode: '95320-000',
+    country: 'Brasil'
+  },
+  fiscal: {
+    cnpj: '88.235.288/0001-24',
+    ie: '0850011930',
+    im: '',
+    taxRegime: 'simples_nacional',
+    icmsContributor: true,
+    issContributor: false,
+    pisContributor: false,
+    cofinsContributor: false,
+    crt: '1',
+    cnae: '1622-9/00',
+    cnaes: []
+  },
+  banking: {
+    bank: '',
+    agency: '',
+    account: '',
+    accountType: 'corrente',
+    pix: ''
+  }
+};
 const defaultProductSettings: ProductSettings = {
   categories: [
     'Painéis', 'Ferragens', 'Madeiras', 'Vernizes', 'Colas', 'Parafusos', 
@@ -128,6 +194,7 @@ export const useSettings = () => {
 
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [pdfSettings, setPdfSettings] = useState<PDFSettings>(defaultPDFSettings);
+  const [companySettings, setCompanySettings] = useState<CompanySettings>(defaultCompanySettings);
   const [productSettings, setProductSettings] = useState<ProductSettings>(defaultProductSettings);
 
   // Carregar configurações do localStorage
@@ -139,6 +206,16 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         setPdfSettings({ ...defaultPDFSettings, ...parsed });
       } catch (error) {
         console.error('Erro ao carregar configurações do PDF:', error);
+      }
+    }
+
+    const savedCompanySettings = localStorage.getItem('companySettings');
+    if (savedCompanySettings) {
+      try {
+        const parsed = JSON.parse(savedCompanySettings);
+        setCompanySettings({ ...defaultCompanySettings, ...parsed });
+      } catch (error) {
+        console.error('Erro ao carregar configurações da empresa:', error);
       }
     }
 
@@ -159,6 +236,10 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, [pdfSettings]);
 
   useEffect(() => {
+    localStorage.setItem('companySettings', JSON.stringify(companySettings));
+  }, [companySettings]);
+
+  useEffect(() => {
     localStorage.setItem('productSettings', JSON.stringify(productSettings));
   }, [productSettings]);
 
@@ -171,8 +252,19 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         ...prev.header, 
         ...newSettings.header,
         companyName: { ...prev.header.companyName, ...newSettings.header?.companyName }
+        gradient: { ...prev.header.gradient, ...newSettings.header?.gradient }
       },
-      company: { ...prev.company, ...newSettings.company }
+    }));
+  };
+
+  const updateCompanySettings = (newSettings: Partial<CompanySettings>) => {
+    setCompanySettings(prev => ({
+      ...prev,
+      ...newSettings,
+      basic: { ...prev.basic, ...newSettings.basic },
+      address: { ...prev.address, ...newSettings.address },
+      fiscal: { ...prev.fiscal, ...newSettings.fiscal },
+      banking: { ...prev.banking, ...newSettings.banking }
     }));
   };
 
@@ -190,6 +282,11 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     localStorage.removeItem('pdfSettings');
   };
 
+  const resetCompanySettings = () => {
+    setCompanySettings(defaultCompanySettings);
+    localStorage.removeItem('companySettings');
+  };
+
   const resetProductSettings = () => {
     setProductSettings(defaultProductSettings);
     localStorage.removeItem('productSettings');
@@ -198,10 +295,13 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   return (
     <SettingsContext.Provider value={{
       pdfSettings,
+      companySettings,
       productSettings,
       updatePDFSettings,
+      updateCompanySettings,
       updateProductSettings,
       resetPDFSettings,
+      resetCompanySettings,
       resetProductSettings
     }}>
       {children}

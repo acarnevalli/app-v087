@@ -45,10 +45,9 @@ const Projects: React.FC = () => {
 
   const generatePDF = async (project: Project) => {
     const { jsPDF } = await import('jspdf');
+    const { companySettings } = useSettings();
     const doc = new jsPDF();
     
-    // Usar configurações personalizáveis
-    const companyInfo = pdfSettings.company;
     
     // Adicionar marca d'água se habilitada
     if (pdfSettings.watermark.enabled) {
@@ -176,19 +175,19 @@ const Projects: React.FC = () => {
     doc.setTextColor(textColor.r, textColor.g, textColor.b);
     doc.setFontSize(pdfSettings.header.companyName.fontSize);
     doc.setFont('helvetica', pdfSettings.header.companyName.fontWeight);
-    doc.text(companyInfo.name, 45, 18);
+    doc.text(companySettings.basic.name, 45, 18);
     
     // Informações de contato
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
-    doc.text(companyInfo.address, 45, 24);
-    doc.text(companyInfo.city, 45, 28);
+    doc.text(`${companySettings.address.street}, ${companySettings.address.number}`, 45, 24);
+    doc.text(`${companySettings.address.city} - ${companySettings.address.state} - CEP: ${companySettings.address.zipCode}`, 45, 28);
     
     // Informações de contato no lado direito
-    doc.text(companyInfo.phone, 140, 18);
-    doc.text(companyInfo.email, 140, 22);
-    doc.text(`CNPJ: ${companyInfo.cnpj}`, 140, 26);
-    doc.text(`IE: ${companyInfo.ie}`, 140, 30);
+    doc.text(companySettings.basic.phone, 140, 18);
+    doc.text(companySettings.basic.email, 140, 22);
+    doc.text(`CNPJ: ${companySettings.fiscal.cnpj}`, 140, 26);
+    doc.text(`IE: ${companySettings.fiscal.ie}`, 140, 30);
     
     // Título do documento
     doc.setTextColor(0, 0, 0);
